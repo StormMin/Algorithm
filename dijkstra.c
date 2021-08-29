@@ -4,37 +4,55 @@
 #include <string.h>
 #include <math.h>
 #include <stdbool.h>
-long long d[100000];
-bool visited[100000];
-long long q[100000], front = -1, rear = -1;
-int main()
-{
-	long long A, B;
-	scanf("%lld %lld", &A, &B);
-	q[++rear] = A;
-	d[rear] = 1;
-	visited[q[rear]] = 1;
-	while (front != rear) {
-		front++;
-		if (visited[q[front] * 10 + 1] == 0 && q[front] * 10 + 1 <= B) {
-			q[++rear] = q[front] * 10 + 1;
-			d[rear] = d[front] + 1;
-			visited[q[rear]] = 1;
-		}
-		if (q[rear] == B) {
-			printf("%lld", d[rear]);
-			return 0;
-		}
-		if (visited[q[front] * 2] == 0 && q[front] * 2 <= B) {
-			q[++rear] = q[front] * 2;
-			d[rear] = d[front] + 1;
-			visited[q[rear]] = 1;
-		}
-		if (q[rear] == B) {
-			printf("%lld", d[rear]);
-			return 0;
+int INF = 1000;
+int V, E, K;
+int Graph[20001][20001];
+bool v[20001];
+int d[20001];
+int getSmallIndex() {
+	int min = -INF;
+	int index = 0;
+	for (int i = 0; i < V; i++) {
+		if (d[i] > min && !v[i]&&d[i]!=0) {
+			min = d[i];
+			index = i;
 		}
 	}
-	printf("-1");
+	return index;
+}
+void dijkstra(int start) {
+	for (int i = 0; i < V; i++) {
+		d[i] = Graph[start][i];
+	}
+	v[start] = true;
+	for (int i = 0; i < V - 2; i++) {
+		int current = getSmallIndex();
+		v[current] = true;
+		for (int j = 0; j < V; j++) {
+			if (!v[j]) {
+				if (d[j] == 0) d[j] = -100;
+				if (d[current] + Graph[current][j] > d[j]) {
+					d[j] = d[current] + Graph[current][j];
+				}
+			}
+		}
+	}
+}
+int main()
+{
+	scanf("%d %d", &V, &E);
+	scanf("%d", &K);
+	int x, y, z;
+	for (int i = 0; i < E; i++) {
+		scanf("%d %d %d", &x, &y, &z);
+		Graph[x][y] = -z;
+	}
+
+	dijkstra(K);
+	for (int i = 0; i < V; i++) {
+		if (d[i] == 0&&i!=K) printf("INF\n");
+		else
+		printf("%d\n", -d[i]);
+	}
 	return 0;
 }
