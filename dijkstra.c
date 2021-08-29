@@ -4,35 +4,34 @@
 #include <string.h>
 #include <math.h>
 #include <stdbool.h>
-int INF = 1000;
-int V, E, K;
-int Graph[20001][20001];
-bool v[20001];
-int d[20001];
-int getSmallIndex() {
-	int min = -INF;
+long long INF = 987654321;
+int N, M;
+bool v[10000],vs[1002][1002];
+long long d[10000];
+int G[1002][1002];
+int get() {
+	long long min = INF;
 	int index = 0;
-	for (int i = 0; i < V; i++) {
-		if (d[i] > min && !v[i]&&d[i]!=0) {
+	for (int i = 1; i <= N; i++) {
+		if (d[i] < min && !v[i]) {
 			min = d[i];
 			index = i;
 		}
 	}
 	return index;
 }
-void dijkstra(int start) {
-	for (int i = 0; i < V; i++) {
-		d[i] = Graph[start][i];
+int di(int x) {
+	for (int i = 1; i <= N; i++) {
+		d[i] = G[x][i];
 	}
-	v[start] = true;
-	for (int i = 0; i < V - 2; i++) {
-		int current = getSmallIndex();
-		v[current] = true;
-		for (int j = 0; j < V; j++) {
+	v[x] = 1;
+	for (int i = 1; i <= N - 2; i++) {
+		int current = get();
+		v[current] = 1;
+		for (int j = 1; j <= N; j++) {
 			if (!v[j]) {
-				if (d[j] == 0) d[j] = -100;
-				if (d[current] + Graph[current][j] > d[j]) {
-					d[j] = d[current] + Graph[current][j];
+				if (d[current] + G[current][j] < d[j]) {
+					d[j] = d[current] + G[current][j];
 				}
 			}
 		}
@@ -40,19 +39,30 @@ void dijkstra(int start) {
 }
 int main()
 {
-	scanf("%d %d", &V, &E);
-	scanf("%d", &K);
 	int x, y, z;
-	for (int i = 0; i < E; i++) {
+	scanf("%d %d", &N, &M);
+	for (int i = 1; i <= M; i++) {
 		scanf("%d %d %d", &x, &y, &z);
-		Graph[x][y] = -z;
+		if (vs[x][y]) {
+			if (z < G[x][y]) {
+				G[x][y] = z;
+			}
+		}
+		else {
+			G[x][y] = z;
+		}
+		vs[x][y] = 1;
 	}
+	for (int i = 1; i <= N; i++) {
+		for (int j = 1; j <= N; j++) {
+			if (i != j&&!vs[i][j]) {
+				G[i][j] = INF;
+			}
+		}
+	}
+	scanf("%d %d", &x, &y);
+	di(x);
+	printf("%lld", d[y]);
 
-	dijkstra(K);
-	for (int i = 0; i < V; i++) {
-		if (d[i] == 0&&i!=K) printf("INF\n");
-		else
-		printf("%d\n", -d[i]);
-	}
 	return 0;
 }
